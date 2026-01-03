@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <head>
     <title>Mini Mochi 的相簿</title>
     <meta name="keywords" content="" />
@@ -11,32 +10,11 @@
     <link href="css/magnific-popup.css" rel="stylesheet">
     <link href="css/templatemo_style.css" rel="stylesheet" type="text/css">
 </head>
-
 <body>
     <div class="main-container">
-        <nav class="main-nav">
-            <div id="logo" class="left"><a href="#">Mini Mochi</a></div>
-            <ul class="nav right center-text">
-                <li class="btn active">Home</li>
-                <li class="btn"><a href="about.html">About</a></li>
-                <li class="btn"><a href="awards.html">Awards</a></li>
-                <li class="btn"><a href="contact.html">Contact</a></li>
-                <li class="btn"><a rel="nofollow" href="http://www.facebook.com/templatemo"
-                        target="_parent">External</a></li>
-            </ul>
-        </nav>
-        <div class="content-container">
-            <header>
-                <h1 class="center-text" id="site-title"></h1>
-                <h2 class="center-text" id="site-subtitle"></h2>
-            </header>
-            <div id="portfolio-content" class="center-text">
-                <!-- Dynamic Content Container -->
-                <div id="gallery-container"></div>
-                <!-- Pagination -->
-                <div class="pagination" id="gallery-pagination"></div>
-            </div>
-        </div> <!-- /.content-container -->
+        <div id="dynamic-content">
+            <!-- Content will be loaded here -->
+        </div>
         <footer>
             <p>Copyright &copy; <span id="current-year"></span> JasonTech</p>
             <div class="social right">
@@ -55,6 +33,22 @@
     <script type="text/javascript" src="js/jquery.magnific-popup.min.js"></script>
     <script src="js/pocketbase.umd.js"></script>
     <script src="js/gallery.js"></script>
-</body>
+    <script>
+        $(function () {
+            const hash = window.location.hash.substring(1) || 'home';
+            generateNav(hash);
+            loadContent(hash);
+            $('#current-year').text(new Date().getFullYear());
 
+            // Handle hash changes
+            $(window).on('hashchange', function() {
+                const newHash = window.location.hash.substring(1) || 'home';
+                // Remove existing nav to regenerate
+                $('nav').remove();
+                generateNav(newHash);
+                loadContent(newHash);
+            });
+        });
+    </script>
+</body>
 </html>

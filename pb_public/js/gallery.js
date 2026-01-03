@@ -1,9 +1,9 @@
 const pb = new PocketBase(window.location.origin);
 const PER_PAGE = 8;
 
-async function loadSettings() {
+async function loadSettings(page = 'home') {
     try {
-        const setting = await pb.collection('site_settings').getFirstListItem('', {
+        const setting = await pb.collection('site_settings').getFirstListItem(`page="${page}"`, {
             sort: '-created',
         });
         if (setting.title) $('#site-title').text(setting.title);
@@ -74,11 +74,39 @@ function renderPagination(currentPage, totalPages) {
     $container.html(html);
 }
 
-$(function () {
-    loadSettings();
-    loadPage(1);
-    $('#current-year').text(new Date().getFullYear());
-});
+function generateNav(currentPage) {
+    const navHtml = `
+        <nav class="main-nav">
+            <div id="logo" class="left"><a href="#home">Mini Mochi</a></div>
+            <ul class="nav right center-text">
+                <li class="btn ${currentPage === 'home' ? 'active' : ''}"><a href="#home">Home</a></li>
+                <li class="btn ${currentPage === 'about' ? 'active' : ''}"><a href="#about">About</a></li>
+                <li class="btn ${currentPage === 'awards' ? 'active' : ''}"><a href="#awards">Awards</a></li>
+                <li class="btn ${currentPage === 'contact' ? 'active' : ''}"><a href="#contact">Contact</a></li>
+                <li class="btn"><a rel="nofollow" href="http://www.facebook.com/templatemo" target="_parent">External</a></li>
+            </ul>
+        </nav>
+    `;
+    $('.main-container').prepend(navHtml);
+}
+
+function loadContent(page) {
+    const pageMap = {
+        'home': 'home.html',
+        'about': 'about.html',
+        'awards': 'awards.html',
+        'contact': 'contact.html'
+    };
+    const file = pageMap[page];
+    $('#dynamic-content').load(`${file} .content-container`, function() {
+        if (page === 'home') {
+            loadPage(1);
+        }
+        loadSettings(page);
+    });
+}
+
+// Gallery functions are loaded by index.html for SPA
 
 /* =========================================
    Merged from templatemo_script.js
