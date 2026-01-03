@@ -6,10 +6,13 @@ async function loadSettings(page = 'home') {
         const setting = await pb.collection('site_settings').getFirstListItem(`page="${page}"`, {
             sort: '-created',
         });
-        if (setting.title) $('#site-title').text(setting.title);
-        if (setting.subtitle) $('#site-subtitle').html(setting.subtitle);
+        // 如果有資料就設定，沒有資料就清空（顯示空白）
+        $('#site-title').text(setting.title || '');
+        $('#site-subtitle').html(setting.subtitle || '');
     } catch (err) {
-        // Silent fail if no settings found
+        // 如果出錯也清空（顯示空白）
+        $('#site-title').text('');
+        $('#site-subtitle').html('');
     }
 }
 
@@ -81,9 +84,8 @@ function generateNav(currentPage) {
             <ul class="nav right center-text">
                 <li class="btn ${currentPage === 'home' ? 'active' : ''}"><a href="#home">Home</a></li>
                 <li class="btn ${currentPage === 'about' ? 'active' : ''}"><a href="#about">About</a></li>
-                <li class="btn ${currentPage === 'awards' ? 'active' : ''}"><a href="#awards">Awards</a></li>
-                <li class="btn ${currentPage === 'contact' ? 'active' : ''}"><a href="#contact">Contact</a></li>
-                <li class="btn"><a rel="nofollow" href="http://www.facebook.com/templatemo" target="_parent">External</a></li>
+                <li class="btn ${currentPage === 'timeline' ? 'active' : ''}"><a href="#timeline">Timeline</a></li>
+                <li class="btn ${currentPage === 'guestbook' ? 'active' : ''}"><a href="#guestbook">Guestbook</a></li>
             </ul>
         </nav>
     `;
@@ -94,15 +96,16 @@ function loadContent(page) {
     const pageMap = {
         'home': 'home.html',
         'about': 'about.html',
-        'awards': 'awards.html',
-        'contact': 'contact.html'
+        'timeline': 'timeline.html',
+        'guestbook': 'guestbook.html'
     };
     const file = pageMap[page];
     $('#dynamic-content').load(`${file} .content-container`, function() {
+        // 无论是否有数据，都调用loadSettings来更新或清空title/subtitle
+        loadSettings(page);
         if (page === 'home') {
             loadPage(1);
         }
-        loadSettings(page);
     });
 }
 

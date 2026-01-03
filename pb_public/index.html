@@ -32,7 +32,10 @@
     <script type="text/javascript" src="js/modernizr.min.js"></script>
     <script type="text/javascript" src="js/jquery.magnific-popup.min.js"></script>
     <script src="js/pocketbase.umd.js"></script>
-    <script src="js/gallery.js"></script>
+    <script>
+        // Dynamic timestamp to prevent caching
+        document.write('<script src="js/gallery.js?t=' + Date.now() + '"><\/script>');
+    </script>
     <script>
         $(function () {
             const hash = window.location.hash.substring(1) || 'home';
