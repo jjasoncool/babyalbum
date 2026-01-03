@@ -92,6 +92,41 @@ function generateNav(currentPage) {
     $('.main-container').prepend(navHtml);
 }
 
+async function loadAboutContent() {
+    try {
+        const records = await pb.collection('about_content').getFullList({
+            sort: 'updated'
+        });
+
+        const $container = $('.about-detail');
+        $container.empty();
+
+        records.forEach(record => {
+            let html = `<div class="about-item" style="clear: both; margin-bottom: 40px;">`;
+            html += `<h1>${record.role}</h1>`;
+
+            if (record.image) {
+                const imgUrl = pb.files.getUrl(record, record.image);
+                html += `<img src="${imgUrl}" alt="${record.role}" class="left shadow" style="width: 250px; height: 250px; object-fit: cover; margin-right: 20px;">`;
+            }
+
+            if (record.content) {
+                html += `<div>${record.content}</div>`;
+            }
+
+            html += '</div>';
+            $container.append(html);
+        });
+
+        if (records.length === 0) {
+            $container.html('<p>尚無關於我們的內容。</p>');
+        }
+    } catch (err) {
+        console.error('載入 about 內容失敗:', err);
+        $('.about-detail').html('<p>無法載入內容，請稍後再試。</p>');
+    }
+}
+
 function loadContent(page) {
     const pageMap = {
         'home': 'home.html',
@@ -105,6 +140,8 @@ function loadContent(page) {
         loadSettings(page);
         if (page === 'home') {
             loadPage(1);
+        } else if (page === 'about') {
+            loadAboutContent();
         }
     });
 }
