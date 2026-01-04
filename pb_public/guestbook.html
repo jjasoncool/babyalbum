@@ -4,25 +4,370 @@
         <h2 class="center-text" id="site-subtitle"></h2>
     </header>
     <div id="guestbook-content" class="content">
-        <div class="templatemo_contactmap">
-            <div id="templatemo_map"></div>
+        <div class="guestbook-section">
+            <div class="guestbook-form-container">
+                <h3>Leave a Message</h3>
+                <form id="guestbook-form" role="form">
+                    <div class="form-group">
+                        <label for="guestbook-name">Your Nickname</label>
+                        <input name="name" type="text" class="form-control" id="guestbook-name" placeholder="Enter your nickname" maxlength="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="guestbook-email">Your Email</label>
+                        <input name="email" type="email" class="form-control" id="guestbook-email" placeholder="Enter your email (optional)" maxlength="255">
+                    </div>
+                    <div class="form-group">
+                        <label for="guestbook-message">Your Message</label>
+                        <div id="guestbook-message"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submit-message">Send Message</button>
+                </form>
+    </div>
+</div>
+
+<style>
+/* Guestbook specific styles - only affects guestbook.html */
+
+.guestbook-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 40px 20px;
+    margin-bottom: 30px;
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+.guestbook-form-container {
+    max-width: 650px;
+    margin: 0 auto;
+    float: none;
+    clear: both;
+}
+
+#guestbook-form {
+    float: none;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+.guestbook-form-container h3 {
+    color: #495057;
+    font-size: 28px;
+    font-weight: 300;
+    text-align: center;
+    margin-bottom: 35px;
+    position: relative;
+}
+
+.guestbook-form-container h3::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    border-radius: 2px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #495057;
+    font-size: 15px;
+}
+
+.form-group label::after {
+    content: " *";
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.form-group:nth-child(2) label::after {
+    content: "";
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: 'Open Sans', sans-serif;
+    transition: all 0.3s ease;
+    background: white;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+    background: #fff;
+}
+
+#guestbook-message {
+    min-height: 140px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    background: white;
+    padding: 4px;
+}
+
+#guestbook-message:focus-within {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+.btn-primary {
+    display: block;
+    margin: 0 auto;
+    padding: 14px 40px;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: 'Open Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.messages-section {
+    background: white;
+    padding: 40px 20px;
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    margin-top: 40px;
+}
+
+.messages-section h3 {
+    color: #495057;
+    font-size: 26px;
+    font-weight: 300;
+    text-align: center;
+    margin-bottom: 35px;
+    position: relative;
+}
+
+.messages-section h3::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    border-radius: 2px;
+}
+
+.message-item {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.message-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    background: #fff;
+}
+
+.message-item::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: -10px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid #e9ecef;
+}
+
+.message-item::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: -8px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid #f8f9fa;
+}
+
+.message-author {
+    font-weight: 600;
+    color: #007bff;
+    margin-bottom: 12px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.message-author .mdi {
+    margin-right: 8px;
+    color: #007bff;
+    font-size: 20px;
+}
+
+.message-content {
+    color: #495057;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    word-wrap: break-word;
+}
+
+.message-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin: 10px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.message-content p {
+    margin: 0 0 12px 0;
+}
+
+.message-content ul,
+.message-content ol {
+    margin: 12px 0;
+    padding-left: 20px;
+}
+
+.message-content blockquote {
+    border-left: 4px solid #007bff;
+    padding-left: 16px;
+    margin: 16px 0;
+    font-style: italic;
+    color: #6c757d;
+}
+
+.message-date {
+    color: #6c757d;
+    font-size: 13px;
+    border-top: 1px solid #e9ecef;
+    padding-top: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.message-date .mdi {
+    margin-right: 6px;
+    color: #6c757d;
+    font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .guestbook-section,
+    .messages-section {
+        padding: 25px 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+    }
+
+    .guestbook-form-container h3,
+    .messages-section h3 {
+        font-size: 24px;
+        margin-bottom: 25px;
+    }
+
+    .form-control {
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+
+    .message-item {
+        padding: 20px;
+        margin-bottom: 15px;
+    }
+
+    .message-item::before,
+    .message-item::after {
+        display: none;
+    }
+
+    .btn-primary {
+        padding: 12px 30px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .guestbook-section,
+    .messages-section {
+        padding: 20px 12px;
+        margin-bottom: 15px;
+    }
+
+    .guestbook-form-container h3,
+    .messages-section h3 {
+        font-size: 22px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .message-item {
+        padding: 15px;
+        margin-bottom: 12px;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 14px;
+        font-size: 14px;
+    }
+}
+</style>
+
+        <div id="messages-container" class="messages-section">
+            <h3>Messages</h3>
+            <div id="messages-list"></div>
         </div>
-        <form role="form" method="post" action="#">
-            <div class="templatemo_form">
-                <input name="fullname" type="text" class="form-control" id="fullname" placeholder="Your Name" maxlength="40">
-            </div>
-            <div class="templatemo_form">
-                <input name="email" type="text" class="form-control" id="email" placeholder="Your Email" maxlength="40">
-            </div>
-            <div class="templatemo_form">
-                <textarea name="message" rows="10" class="form-control" id="message" placeholder="Message"></textarea>
-            </div>
-            <div class="templatemo_form"><button type="submit" class="btn btn-primary">Send Message</button></div>
-            <address class="content-description">
-                <i class="fa fa-phone"></i> 010-010-0110<br>
-                <i class="fa fa-map-marker"></i> 110 Proin eu erat vitae, mauris ullamcorper luctus 10110<br>
-                <i class="fa fa-envelope"></i> <a href="#">info@company.com</a><br>
-            </address>
-        </form>
     </div>
 </div>

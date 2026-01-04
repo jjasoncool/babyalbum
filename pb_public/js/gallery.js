@@ -222,6 +222,103 @@ async function loadAboutContent() {
     }
 }
 
+async function loadGuestbookMessages() {
+    try {
+        const messages = await pb.collection('guestbook_messages').getFullList({
+            sort: '-created'
+        });
+
+        const $container = $('#messages-list');
+        $container.empty();
+
+        if (messages.length === 0) {
+            $container.html('<p>還沒有留言，快來留下第一則吧！</p>');
+            return;
+        }
+
+        messages.forEach(message => {
+            const date = new Date(message.created);
+            const dateStr = date.toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            let html = '<div class="message-item">';
+            if (message.name) {
+                html += `<div class="message-author"><span class="mdi mdi-account"></span>${message.name}</div>`;
+            }
+            html += `<div class="message-content">${message.message}</div>`;
+            html += `<div class="message-date"><span class="mdi mdi-clock"></span>${dateStr}</div>`;
+            html += '</div>';
+
+            $container.append(html);
+        });
+    } catch (err) {
+        console.error('載入留言失敗:', err);
+        $('#messages-list').html('<p>無法載入留言，請稍後再試。</p>');
+    }
+}
+
+async function submitGuestbookMessage(event) {
+    event.preventDefault();
+
+    const $form = $('#guestbook-form');
+    const $submitBtn = $('#submit-message');
+
+    const name = $('#guestbook-name').val().trim();
+    const email = $('#guestbook-email').val().trim();
+    const message = window.quill ? window.quill.root.innerHTML.trim() : '';
+
+    if (!name) {
+        alert('請輸入您的暱稱');
+        return;
+    }
+
+    // Email 驗證：如果有輸入 email，要檢查格式
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alert('請輸入有效的 email 格式');
+        return;
+    }
+
+    if (!message || message === '<p><br></p>' || message === '') {
+        alert('請輸入留言內容');
+        return;
+    }
+
+    // 禁用提交按鈕防止重複提交
+    $submitBtn.prop('disabled', true).text('發送中...');
+
+    try {
+        const data = {
+            name: name || null,
+            email: email || null,
+            message: message
+        };
+
+        await pb.collection('guestbook_messages').create(data);
+
+        // 清空表單
+        $form[0].reset();
+        // 清空富文本編輯器
+        if (window.quill) {
+            window.quill.setContents([]);
+        }
+
+        // 重新載入留言
+        await loadGuestbookMessages();
+
+        alert('留言發送成功！');
+    } catch (err) {
+        console.error('發送留言失敗:', err);
+        alert('發送留言失敗，請稍後再試。');
+    } finally {
+        $submitBtn.prop('disabled', false).text('Send Message');
+    }
+}
+
 function loadContent(page) {
     const pageMap = {
         'home': 'home.html',
@@ -239,6 +336,25 @@ function loadContent(page) {
             loadAboutContent();
         } else if (page === 'timeline') {
             loadTimelineEvents();
+        } else if (page === 'guestbook') {
+            loadGuestbookMessages();
+            // 初始化 Quill 編輯器
+            if (typeof Quill !== 'undefined') {
+                window.quill = new Quill('#guestbook-message', {
+                    theme: 'snow',
+                    placeholder: 'Your Message',
+                    modules: {
+                        toolbar: [
+                            ['bold', 'italic', 'underline'],
+                            ['link', 'image'],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            ['clean']
+                        ]
+                    }
+                });
+            }
+            // 添加表單提交事件監聽器
+            $('#guestbook-form').off('submit').on('submit', submitGuestbookMessage);
         }
     });
 }
