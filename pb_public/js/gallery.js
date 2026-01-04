@@ -92,6 +92,101 @@ function generateNav(currentPage) {
     $('.main-container').prepend(navHtml);
 }
 
+function formatDateTime(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now - date;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    // 格式化日期為中文格式
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const dateStr = `${year}年${month}月${day}日`;
+
+    // 計算相對時間
+    let relativeStr;
+    if (days === 0) relativeStr = '今天';
+    else if (days === 1) relativeStr = '昨天';
+    else if (days < 7) relativeStr = `${days} 天前`;
+    else if (days < 30) relativeStr = `${Math.floor(days / 7)} 週前`;
+    else if (days < 365) relativeStr = `${Math.floor(days / 30)} 個月前`;
+    else relativeStr = `${Math.floor(days / 365)} 年前`;
+
+    return `${dateStr}|${relativeStr}`;
+}
+
+async function loadTimelineEvents() {
+    try {
+        const records = await pb.collection('timeline_events').getFullList({
+            sort: '-date'
+        });
+
+        const $container = $('.container-fluid');
+        $container.empty();
+
+        records.forEach((record, index) => {
+            // 所有項目都放在左邊，跟原本設計一樣
+            const timelineClass = 'left_timeline';
+            const captionClass = 'left';
+            const iconClass = 'right';
+
+            let html = `<div class="time_line_wap ${timelineClass}">`;
+            html += '<div class="time_line_paragraph">';
+
+            // Date caption
+            const dateInfo = formatDateTime(record.date);
+            const [dateStr, relativeStr] = dateInfo.split('|');
+            html += `<div class="time_line_caption ${captionClass}">${dateStr}<br><small>${relativeStr}</small></div>`;
+
+            // Icon
+            if (record.icon) {
+                let iconHtml;
+                if (record.icon.includes('<')) {
+                    // 如果包含 HTML 標籤，加上樣式
+                    if (record.icon.includes('<i ')) {
+                        iconHtml = record.icon.replace('<i ', '<i style="font-size: 48px;" ');
+                    } else if (record.icon.includes('<span ')) {
+                        iconHtml = record.icon.replace('<span ', '<span style="font-size: 48px;" ');
+                    } else if (record.icon.includes('<i>') || record.icon.includes('<i ')) {
+                        iconHtml = record.icon.replace('<i', '<i style="font-size: 48px;"');
+                    } else if (record.icon.includes('<span>') || record.icon.includes('<span ')) {
+                        iconHtml = record.icon.replace('<span', '<span style="font-size: 48px;"');
+                    } else {
+                        // 如果沒有找到特定標籤，在開頭加上 span
+                        iconHtml = `<span style="font-size: 48px;">${record.icon}</span>`;
+                    }
+                } else {
+                    // 否則加上 MDI class 和樣式
+                    iconHtml = `<i class="mdi mdi-${record.icon}" style="font-size: 48px;"></i>`;
+                }
+                html += `<div class="time_line_icon ${iconClass}">${iconHtml}</div>`;
+            }
+
+            // Title
+            if (record.title) {
+                html += `<h1>${record.title}</h1>`;
+            }
+
+            // Content
+            if (record.content) {
+                html += `<div style="line-height: 1.4; margin-top: 10px;">${record.content}</div>`;
+            }
+
+            html += '</div></div>';
+            $container.append(html);
+        });
+
+        if (records.length === 0) {
+            $container.html('<p>尚無大事記。</p>');
+        }
+    } catch (err) {
+        console.error('載入 timeline 事件失敗:', err);
+        $('.container-fluid').html('<p>無法載入大事記，請稍後再試。</p>');
+    }
+}
+
 async function loadAboutContent() {
     try {
         const records = await pb.collection('about_content').getFullList({
@@ -142,6 +237,8 @@ function loadContent(page) {
             loadPage(1);
         } else if (page === 'about') {
             loadAboutContent();
+        } else if (page === 'timeline') {
+            loadTimelineEvents();
         }
     });
 }
