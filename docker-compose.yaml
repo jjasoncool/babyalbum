@@ -7,6 +7,9 @@ services:
       args:
         PB_VERSION: ${PB_VERSION}
         PB_PORT: ${PB_PORT}
+    # 如果需要直接暴露端口，請取消註釋以下行並註釋掉 expose:
+    # ports:
+    #   - "${PB_PORT}:${PB_PORT}"
     expose:
       - "${PB_PORT}"
     volumes:

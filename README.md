@@ -22,6 +22,12 @@ docker exec -it baby-album-backend /pb/pocketbase superuser create admin@example
 
 建立完成後，您即可前往網站管理後台 `/_/` (例如 `http://localhost:8090/_/` 或您的網域名稱) 進行登入。
 
+## Docker Compose 端口配置說明
+
+本專案使用 `expose` 而非 `ports` 是因為 demo network 中有 nginx reverse server 負責反向代理。如果您需要直接從宿主機訪問 PocketBase 的端口，可以修改 `docker-compose.yaml` 中的配置：
+
+將 `expose:` 替換為 `ports:`，並設定為 `"${PB_PORT}:${PB_PORT}"`。
+
 ## 目錄結構說明
 
 - **pb_data/**: 存放 SQLite 資料庫與使用者上傳的檔案 (已加入 gitignore，請勿刪除)。
