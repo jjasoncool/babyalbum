@@ -71,7 +71,7 @@ function renderPagination(currentPage, totalPages) {
 
     let html = '<ul class="nav">';
     for(let i=1; i<=totalPages; i++) {
-        html += `<li class="${i === currentPage ? 'active' : ''}" style="cursor:pointer;" onclick="loadPage(${i})">${i}</li>`;
+        html += `<li class="${i === currentPage ? 'active' : ''}" style="cursor:pointer;" onclick="loadPage(${i}); $('html, body').animate({scrollTop: 0}, 300);">${i}</li>`;
     }
     html += '</ul>';
     $container.html(html);
