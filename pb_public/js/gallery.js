@@ -16,6 +16,21 @@ async function loadSettings(page = 'home') {
     }
 }
 
+async function loadBackgroundImage() {
+    try {
+        const setting = await pb.collection('site_settings').getFirstListItem(`page="background"`, {
+            sort: '-created',
+        });
+        if (setting.photo) {
+            const imgUrl = pb.files.getUrl(setting, setting.photo);
+            document.body.style.backgroundImage = `url(${imgUrl})`;
+        }
+    } catch (err) {
+        // 如果沒有背景設定或出錯，保持預設
+        console.log('No background image set or error loading:', err);
+    }
+}
+
 async function loadPage(page) {
     try {
         const result = await pb.collection('photos').getList(page, PER_PAGE, {
@@ -372,7 +387,7 @@ function loadContent(page) {
     };
     const file = pageMap[page];
     $('#dynamic-content').load(`${file} .content-container`, function() {
-        // 无论是否有数据，都调用loadSettings来更新或清空title/subtitle
+        // 無論是否有資料，都呼叫 loadSettings 來更新或清空 title/subtitle
         loadSettings(page);
         if (page === 'home') {
             loadPage(1);
@@ -418,19 +433,7 @@ function changePage(event) {
   $(this).addClass('active');
 }
 
-/*  Google Map */
-function loadScript() {
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&' +
-      'callback=initialize';
-  document.body.appendChild(script);
-}
-
-function initialize() {
-    var mapOptions = {
-      zoom: 12,
-      center: new google.maps.LatLng(40.7823234,-73.9654161)
-    };
-    var map = new google.maps.Map(document.getElementById('templatemo_map'),  mapOptions);
-}
+// 初始化背景圖片
+$(document).ready(function() {
+    loadBackgroundImage();
+});

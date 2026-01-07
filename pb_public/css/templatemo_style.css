@@ -25,7 +25,12 @@ a { text-decoration: none; }
 --------------------------------------*/
 
 * {	font-family: 'Open Sans', sans-serif; }
-body { background-color: #eee; }
+body {
+    background-color: #eee;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+}
 
 h1 {
 	font-size: 30px;
@@ -60,7 +65,7 @@ footer p, address {	font-size: 14px; }
 .main-container {
 	max-width: 1200px;
 	margin: 0 auto;
-	background: white;
+	background: rgba(255, 255, 255, 0.8);
 	box-shadow: 0 0 5px rgba(107, 110, 112, 0.4);
 }
 
