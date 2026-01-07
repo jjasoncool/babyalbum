@@ -73,19 +73,38 @@ footer p, address {	font-size: 14px; }
 }
 .content { padding-top: 15px; }
 
-.main-nav { border-bottom: #DDDDDD 1px solid; }
-
-.main-nav li {
-	margin-right: 2px;
-	background-color: rgba(255, 255, 255, 1);
-	box-shadow: 1px 1px 1px rgba(80, 80, 80, 0.4);
+.main-nav {
+	border-bottom: #DDDDDD 1px solid;
+	position: sticky;
+	top: 0;
+	z-index: 1000;
+	background-color: white;
 }
 
-.main-nav li a { display: block; padding: 12px 24px; }
+.main-nav li {
+	margin-right: 5px;
+	background: transparent;
+    border-radius: 5px;
+}
 
-.main-nav li.active { background-color: #A7DDFF; }
+.main-nav li a {
+    display: block;
+    padding: 10px 20px;
+    color: #666;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+}
 
-.main-nav li a:hover { background-color: #A7DDFF; }
+.main-nav li.active a,
+.main-nav li a:hover {
+    background-color: #A7DDFF;
+    color: #333;
+    text-decoration: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+/* Remove old li active bg */
+.main-nav li.active { background-color: transparent; }
 
 nav {
 	overflow: hidden;
@@ -309,6 +328,12 @@ p.justify { text-align: justify; }
     line-height: 2em;
     color: #000;
 }
+#templatemo_timeline .time_line_paragraph img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 10px 0;
+}
 #templatemo_timeline i { padding: 20px 20px 0 0; }
 
 /*	6. Contact Styles
@@ -364,6 +389,18 @@ span.btn {
 	border: 1px solid #e5e5e5;
 }
 
+/* Mobile Menu Toggle */
+.menu-toggle {
+    display: none;
+    position: absolute;
+    top: 25px;
+    right: 20px;
+    cursor: pointer;
+    font-size: 32px;
+    color: #909090;
+    z-index: 1001;
+}
+
 /* 7. Media queries
 -----------------------------------------------------*/
 @media screen and (max-width: 980px) {
@@ -377,30 +414,43 @@ span.btn {
 	}
 
 }
-@media screen and (max-width: 806px) and (min-width: 701px) {
+@media screen and (max-width: 806px) and (min-width: 769px) {
 	#logo {
 		float: none;
 		text-align: center;
 	}
 	.main-nav ul { float: none;	}
 }
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+
 	#logo {
 		float: none;
-		text-align: center;
+		text-align: left; /* Logo on left */
+        margin-left: 10px;
+        font-size: 36px !important; /* Smaller logo icon */
 	}
+    #logo a {
+        font-size: 30px !important; /* Smaller logo text */
+    }
+
 	.main-nav ul {
-		display: block;
+		display: none; /* Hidden by default */
 		float: none;
 		padding: 0;
+        margin-top: 10px;
+        flex-direction: column;
 	}
 	.main-nav ul.nav li {
-		width: 96%;
-
+		width: 100%;
+        display: block;
+        margin: 0;
 	}
-	.main-nav ul.nav li a { padding: 2%; }
-	.main-nav ul.nav li.active { padding: 0; padding: 2% 0; }
-	.main-nav ul.nav li a:hover { padding: 2%; }
+	.main-nav ul.nav li a { padding: 10px; border-bottom: 1px solid #eee; }
+	.main-nav ul.nav li.active { padding: 0; }
+	.main-nav ul.nav li a:hover { padding: 10px; }
 
 	header {
 		padding-top: 0;
@@ -433,15 +483,21 @@ span.btn {
 }
 @media screen and (max-width:400px) {
 	.main-nav li {
-		width: auto;
+		/* width: auto; Removed to allow full width stack */
 	    margin-left: 0;
 	    margin-right: 0;
 	    font-size: 12px;
 	    text-align: center;
 	    line-height: 30px;
-	    flex: 1;
+	    /* flex: 1; Removed */
 	}
 	.main-nav ul.nav li a { padding: 2%; }
 	.main-nav ul.nav li.active { padding: 0; padding: 2% 0; }
 	.main-nav ul.nav li a:hover { padding: 2%; }
+}
+
+@media screen and (min-width: 769px) {
+    .main-nav ul {
+        display: flex !important;
+    }
 }

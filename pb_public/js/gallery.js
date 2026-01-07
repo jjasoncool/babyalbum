@@ -40,7 +40,7 @@ function renderPhotos(items) {
         const html = `
             <div class="portfolio-group">
                 <a class="portfolio-item" href="${imgUrl}">
-                    <img src="${imgUrl}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="${imgUrl}" alt="${item.title}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="detail">
                         <h3>${item.title}</h3>
                         <p>${item.description || ''}</p>
@@ -81,6 +81,7 @@ function generateNav(currentPage) {
     const navHtml = `
         <nav class="main-nav">
             <div id="logo" class="left"><a href="#home">Mini Mochi</a></div>
+            <div class="menu-toggle"><i class="mdi mdi-menu"></i></div>
             <ul class="nav right center-text">
                 <li class="btn ${currentPage === 'home' ? 'active' : ''}"><a href="#home">Home</a></li>
                 <li class="btn ${currentPage === 'about' ? 'active' : ''}"><a href="#about">About</a></li>
@@ -90,14 +91,24 @@ function generateNav(currentPage) {
         </nav>
     `;
     $('.main-container').prepend(navHtml);
+
+    // Mobile menu toggle
+    $('.menu-toggle').on('click', function() {
+        $('ul.nav').slideToggle();
+    });
 }
 
 function formatDateTime(dateString) {
     if (!dateString) return '';
     const date = new Date(dateString);
     const now = new Date();
-    const diff = now - date;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    // 使用當日午夜時間來比較日期，避免時間差造成計算錯誤
+    const dateMidnight = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const nowMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const diffTime = nowMidnight - dateMidnight;
+    const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     // 格式化日期為中文格式
     const year = date.getFullYear();
@@ -109,6 +120,7 @@ function formatDateTime(dateString) {
     let relativeStr;
     if (days === 0) relativeStr = '今天';
     else if (days === 1) relativeStr = '昨天';
+    else if (days < 0) relativeStr = '未來';
     else if (days < 7) relativeStr = `${days} 天前`;
     else if (days < 30) relativeStr = `${Math.floor(days / 7)} 週前`;
     else if (days < 365) relativeStr = `${Math.floor(days / 30)} 個月前`;
@@ -171,7 +183,39 @@ async function loadTimelineEvents() {
 
             // Content
             if (record.content) {
-                html += `<div style="line-height: 1.4; margin-top: 10px;">${record.content}</div>`;
+                let contentHtml = record.content;
+
+                // 處理 rich text 中的圖片
+                // 1. 加上 max-width 防止破版
+                // 2. 使用 thumb 參數讀取壓縮圖節省流量
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = contentHtml;
+
+                const images = tempDiv.querySelectorAll('img');
+                images.forEach(img => {
+                    // 確保圖片響應式
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    img.style.display = 'block';
+                    img.style.margin = '10px 0';
+
+                    // 啟用延遲載入 (Lazy Loading)
+                    img.setAttribute('loading', 'lazy');
+
+                    // 如果是 PocketBase 的圖片連結，加上 thumb 參數
+                    if (img.src && img.src.includes('/api/files/')) {
+                        // 檢查是否已經有參數
+                        const separator = img.src.includes('?') ? '&' : '?';
+                        // 如果還沒有 thumb 參數，則加上
+                        if (!img.src.includes('thumb=')) {
+                            // 設定寬度 500px，高度自動 (500x0)
+                            img.src = `${img.src}${separator}thumb=500x0`;
+                        }
+                    }
+                });
+
+                contentHtml = tempDiv.innerHTML;
+                html += `<div style="line-height: 1.4; margin-top: 10px;">${contentHtml}</div>`;
             }
 
             html += '</div></div>';
@@ -202,7 +246,7 @@ async function loadAboutContent() {
 
             if (record.image) {
                 const imgUrl = pb.files.getUrl(record, record.image);
-                html += `<img src="${imgUrl}" alt="${record.role}" class="left shadow" style="width: 250px; height: 250px; object-fit: cover; margin-right: 20px;">`;
+                html += `<img src="${imgUrl}" alt="${record.role}" loading="lazy" class="left shadow" style="width: 250px; height: 250px; object-fit: cover; margin-right: 20px;">`;
             }
 
             if (record.content) {
