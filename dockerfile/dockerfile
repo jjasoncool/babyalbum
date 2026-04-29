@@ -9,7 +9,8 @@ ENV PB_PORT=${PB_PORT}
 RUN apk add --no-cache \
     unzip \
     ca-certificates \
-    wget
+    wget \
+    imagemagick
 
 # 下載並解壓縮
 ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip /tmp/pb.zip

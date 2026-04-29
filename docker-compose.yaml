@@ -1,4 +1,3 @@
-version: "3.7"
 services:
   pocketbase:
     build:
@@ -15,6 +14,7 @@ services:
     volumes:
       # 把容器內的 pb_data 掛載出來，確保資料永久保存
       - ./pb_data:/pb/pb_data
+      - ./pb_hooks:/pb/pb_hooks
       - ./pb_public:/pb/pb_public
       - ./pb_migrations:/pb/pb_migrations
     # 這裡可以限制只有 50MB 記憶體，對 PocketBase 來說綽綽有餘

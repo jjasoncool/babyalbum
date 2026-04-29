@@ -1,6 +1,14 @@
 const pb = new PocketBase(window.location.origin);
 const PER_PAGE = 8;
 
+function getFileUrl(record, filename, options = {}) {
+    return pb.files.getURL(record, filename, options);
+}
+
+function getThumbUrl(record, filename, size = '500x0') {
+    return getFileUrl(record, filename, { thumb: size });
+}
+
 async function loadSettings(page = 'home') {
     try {
         const setting = await pb.collection('site_settings').getFirstListItem(`page="${page}"`, {
@@ -22,7 +30,7 @@ async function loadBackgroundImage() {
             sort: '-created',
         });
         if (setting.photo) {
-            const imgUrl = pb.files.getUrl(setting, setting.photo);
+            const imgUrl = getThumbUrl(setting, setting.photo, '1600x0');
             document.body.style.backgroundImage = `url(${imgUrl})`;
         }
     } catch (err) {
@@ -51,11 +59,12 @@ function renderPhotos(items) {
     const $pageDiv = $('<div class="portfolio-page" style="display:block;"></div>');
 
     $.each(items, function(index, item) {
-        const imgUrl = pb.files.getUrl(item, item.image);
+        const imgUrl = getFileUrl(item, item.image);
+        const thumbUrl = getThumbUrl(item, item.image, '500x500');
         const html = `
             <div class="portfolio-group">
                 <a class="portfolio-item" href="${imgUrl}">
-                    <img src="${imgUrl}" alt="${item.title}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="${thumbUrl}" alt="${item.title}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="detail">
                         <h3>${item.title}</h3>
                         <p>${item.description || ''}</p>
@@ -260,7 +269,7 @@ async function loadAboutContent() {
             html += `<h1>${record.role}</h1>`;
 
             if (record.image) {
-                const imgUrl = pb.files.getUrl(record, record.image);
+                const imgUrl = getThumbUrl(record, record.image, '250x250');
                 html += `<img src="${imgUrl}" alt="${record.role}" loading="lazy" class="left shadow" style="width: 250px; height: 250px; object-fit: cover; margin-right: 20px;">`;
             }
 

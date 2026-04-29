@@ -34,3 +34,24 @@ docker exec -it baby-album-backend /pb/pocketbase superuser create admin@example
 - **pb_public/**: 存放前端靜態網頁檔案 (HTML/CSS/JS)。
 - **pb_migrations/**: 存放資料庫結構變更紀錄 (用於版本控管)。
 - **.env**: 環境變數設定 (包含 PocketBase 版本與 Port 設定)。
+
+## 圖片壓縮與縮圖
+
+本專案已加入兩層圖片最佳化：
+
+1. **後端自動壓縮原始上傳圖**
+   `pb_hooks/image_optimize.pb.js` 會在以下 Collection 新增/更新圖片後，使用 ImageMagick 壓縮原始檔：
+   - `photos.image`
+   - `about_content.image`
+   - `site_settings.photo`
+
+   預設會將圖片最大邊縮到 `1920px`、移除 EXIF metadata，並調整 JPG/WebP/PNG 品質。這可以節省 `pb_data/storage` 的儲存空間。
+
+2. **前台使用 PocketBase thumb 參數**
+   前台顯示圖片時會使用 `?thumb=...` 輸出較小圖，例如相簿列表使用 `500x500`、背景圖使用 `1600x0`、About 頭像使用 `250x250`，降低前台流量與載入時間。
+
+> 若是既有 Docker image，請重新 build 才會安裝 ImageMagick：
+>
+> ```bash
+> docker-compose up -d --build
+> ```
